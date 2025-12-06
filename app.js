@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const mysql = require('mysql2')
@@ -5,7 +6,7 @@ const path = require('path')
 app.use(express.static(path.join(__dirname, 'public')))
 const con = mysql.createConnection({
     user: 'root',
-    password: '******',
+    password: process.env.PASSWORD,
     port: 3306,
     database: 'candidatos'
 })
