@@ -6,7 +6,7 @@ const path = require('path')
 app.use(express.static(path.join(__dirname, 'public')))
 const con = mysql.createConnection({
     user: 'root',
-    password: process.env.PASSWORD,
+    password: 'santossempresantos',
     port: 3306,
     database: 'candidatos'
 })
@@ -28,11 +28,11 @@ app.post('/voto', (req, res) => {
         con.query("SELECT * FROM candidatos WHERE codigo=? OR codigo=0 ORDER BY codigo DESC", [codigo], (err, data) => {
             console.log(data)
             if (err) {
-                res.status(500).send('internal server error')
+                res.status(500).send('erro interno do servidor')
             } else {
                 if (data.length === 1 && data[0].codigo !== 0) {
                     console.log('candidato não existe.')
-                    res.send('candidato não encontrado.')
+                    res.status(401).send('candidato não encontrado.')
                 } else {
                         if (data.length === 2) {
                             console.log('candidato encontrado.')
@@ -41,8 +41,8 @@ app.post('/voto', (req, res) => {
                             votosAtual++
                             con.query("UPDATE candidatos SET votos=? WHERE codigo=?", [votosAtual, data[0].codigo], (err) => {
                                 if (err) {
-                                    console.log('internal server error')
-                                    res.status(500).send('internal server error')
+                                    console.log('erro interno do servidor')
+                                    res.status(500).send('erro interno do servidor')
                                 } else {
                                      let votos_b = data[1].votos
                                              let boletim = {
@@ -63,10 +63,11 @@ app.post('/voto', (req, res) => {
                             votosAtual++
                             con.query("UPDATE candidatos SET votos=? WHERE codigo=?", [votosAtual, data[0].codigo], (err) => {
                                 if (err) {
-                                    console.log('internal server error')
-                                    res.status(500).send('internal server error')
+                                    console.log('erro interno do servidor')
+                                    res.status(500).send('erro interno do servidor')
                                 } else {
-                                     let votos_b = data[0].votos
+                                    if (data.length === 2) {
+                                         let votos_b = data[0].votos
                                              let boletim = {
                                                 nome: 'voto em branco',
                                                 votos: data[0].votos,
@@ -75,8 +76,21 @@ app.post('/voto', (req, res) => {
                                              }
                                             console.log('enviando dados.')
                                             res.send(JSON.stringify(boletim))
+                                    } else {
+                                        if (data[0].codigo === codigo && codigo===0) {
+                                            let boletim = {
+                                            nome: 'voto em branco',
+                                            votos_branco: data[0].votos,
+                                            votos: data[0].votos,
+                                            codigo: k2
+                                            } 
+                                            res.send(JSON.stringify(boletim))
+                                    } else {
+                                        console.log('nada ve')
+                                        res.status(401).send('candidato nada ve')
+                                    }
                                 }
-                            })
+                            }})
 
                             }
                         }
@@ -94,7 +108,7 @@ app.post('/cred', (req, res) => {
         let k2 = parseInt(k)
         console.log(k2)
         con.query("SELECT * FROM candidatos WHERE codigo=? OR codigo=0 ORDER BY codigo DESC", [k2], (err, data) => {
-            if (err) {console.log('internal server error'); res.status(500).send('internal server error')} else {
+            if (err) {console.log('erro interno do servidor'); res.status(500).send('erro interno do servidor')} else {
                 console.log(data)
                 if (data.length === 1 && data[0].codigo !== 0) {
                     console.log('candidato inexistente.')

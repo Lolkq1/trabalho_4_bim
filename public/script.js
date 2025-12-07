@@ -21,11 +21,13 @@ const input = document.querySelector("#candidato")
                     candid.textContent = 'candidato: '+obj.nome
                 })
             } else {
-                    console.log('deu ero')
-                    alert('erro: ta de marola pcr us guri vai te gruda tu te cuida guri senao os guri vao ai')
+                    console.log('deu erro')
+                    alert('erro: o candidato no qual você votou não existe.')
                     }
         }) } else {
-            btn.addEventListener("click", () => {
+        //parte do voto
+        
+        btn.addEventListener("click", () => {
         if (input.value.length != 0 && input.value != " " && typeof parseInt(input.value) === "number") {
             fetch('/voto', {
         method: 'POST',
@@ -47,8 +49,19 @@ const input = document.querySelector("#candidato")
                     candid.textContent = 'candidato: '+obj.nome
                 })
             } else {
-                console.log('deu erro')
-                alert('ocorreu um erro.')
+                if (res.status === 500) {
+                    console.log('deu erro')
+                    alert('erro interno do servidor.')
+                } else {
+                    if (res.status === 401) {
+                        console.log('candidato inexistente.')
+                        alert('candidato não encontrado.')
+                    } else {
+                        console.log('erro desconhecido.')
+                        alert('erro desconhecido.')
+                    }
+                }
+                
             }
         })
         } else {
