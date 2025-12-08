@@ -6,7 +6,7 @@ const path = require('path')
 app.use(express.static(path.join(__dirname, 'public')))
 const con = mysql.createConnection({
     user: 'root',
-    password: 'santossempresantos',
+    password: process.env.PASSWORD,
     port: 3306,
     database: 'candidatos'
 })
@@ -110,10 +110,6 @@ app.post('/cred', (req, res) => {
         con.query("SELECT * FROM candidatos WHERE codigo=? OR codigo=0 ORDER BY codigo DESC", [k2], (err, data) => {
             if (err) {console.log('erro interno do servidor'); res.status(500).send('erro interno do servidor')} else {
                 console.log(data)
-                if (data.length === 1 && data[0].codigo !== 0) {
-                    console.log('candidato inexistente.')
-                    res.status(401).send('candidato nao existe.')
-                } else {
                     if (data.length === 2) {
                         let boletim = {
                         nome: data[0].nome,
@@ -136,7 +132,7 @@ app.post('/cred', (req, res) => {
                         res.status(401).send('candidato nada ve')
                     }
                 }
-                }
+                
             }
         })
     })
