@@ -3,6 +3,8 @@ const express = require('express')
 const app = express()
 const mysql = require('mysql2')
 const path = require('path')
+const crypto = require('crypto')
+const bcrypt = require('bcrypt')
 app.use(express.static(path.join(__dirname, 'public')))
 const con = mysql.createConnection({
     user: 'root',
@@ -138,6 +140,13 @@ app.post('/cred', (req, res) => {
     })
 })
 
+app.post('/criar', (req, res) => {
+    
+})
+
+app.post('/login', (req, res) => {
+
+})
 
 app.listen(8080, () => {
     console.log('servidor rodando em 8080')
