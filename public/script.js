@@ -40,7 +40,8 @@ if (sessionT !== undefined && sessionT.length > 0) {
         method: 'POST',
         body: JSON.stringify(
             {
-                codigo: input.value
+                codigo: input.value,
+                eleitor: localStorage.getItem('sessionToken')
             }
         )
         }).then(res => {

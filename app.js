@@ -27,6 +27,29 @@ app.post('/voto', (req, res) => {
     req.on('end', () => {
         let j2 = JSON.parse(j)
         let codigo = j2.codigo
+        let user = j2.token
+        con.query("SELECT * FROM sessoes where token=?", [user], (err, data) => {
+            if (err) {res.status(500).send('E.I.S.')} else {
+                if (data.length === 0) {
+                    res.status(401).send('usuario nao está logado//token inválido.')
+                } else {
+                    con.query("SELECT * FROM usuarios WHERE email=?", [data[0].email], (err, data2) => {
+                        if (err) {console.log('erro interno svr')} else {
+                            if (data2.length === 0) {
+                            res.status(401).send('erro incomum: token válido, email inválido.')
+                            } else {
+                                if (data2[0].votou === true) {
+                                    res.status(401).send('usuário já votou.')
+                                } else {
+                                    
+                                }
+                            } 
+                        }
+                        
+                    } )
+                }
+            }
+        })
         con.query("SELECT * FROM candidatos WHERE codigo=? OR codigo=0 ORDER BY codigo DESC", [codigo], (err, data) => {
             console.log(data)
             if (err) {
@@ -157,7 +180,7 @@ app.post('/criar', (req, res) => {
                         bcrypt.hash(messi.senha, 3).then(hash => {
                         let horaresenha = new Date()
                         let token = crypto.createHash('sha256').update(horaresenha).digest('hex')
-                        con.query('INSERT INTO usuarios VALUES (?,?,?)', [messi.email, messi.nome, hash], (err) => {
+                        con.query('INSERT INTO usuarios VALUES (?,?,?,?,?)', [messi.email, messi.nome, hash, false, -1], (err) => {
                             if (err) {
                                 console.log('erro interno do servidor')
                                 res.status(500).send('erro interno do servidor')

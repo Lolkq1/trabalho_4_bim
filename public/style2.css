@@ -1,0 +1,26 @@
+body {
+    min-height: 100vh;
+    min-width: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* div {
+    display: none;
+} */
+
+div {
+    width: 300px;
+    height: 400px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    box-shadow: 0 0 10px;
+    border-radius: 5px;
+    display: none;
+}
+
+#mainDiv {
+    display: inline;
+}
