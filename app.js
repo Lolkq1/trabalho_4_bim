@@ -197,6 +197,7 @@ app.post('/login', (req, res) => {
                         if (resultado) {
                             let data = new Date()
                             let token = crypto.createHash('sha256').update(data).digest('hex')
+                            console.log('tudo certo! Senha correta; enviando token de sessão para o cliente... vai pra cima deles SANTOOOOOOOOOOOOOOOOOOOOOOOS')
                             res.send(token)
                         } else {
                             console.log('senha incorreta inserida.')
