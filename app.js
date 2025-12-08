@@ -41,7 +41,78 @@ app.post('/voto', (req, res) => {
                                 if (data2[0].votou === true) {
                                     res.status(401).send('usuário já votou.')
                                 } else {
-                                    
+                                    con.query("SELECT * FROM candidatos WHERE codigo=? OR codigo=0 ORDER BY codigo DESC", [codigo], (err, data) => {
+                                        console.log(data)
+                                        if (err) {
+                                            res.status(500).send('erro interno do servidor')
+                                        } else {
+                                            if (data.length === 1 && data[0].codigo !== 0) {
+                                                console.log('candidato não existe.')
+                                                res.status(401).send('candidato não encontrado.')
+                                            } else {
+                                                    if (data.length === 2) {
+                                                        console.log('candidato encontrado.')
+                                                        let votosAtual = data[0].votos
+                                                        console.log(data[0].votos)
+                                                        votosAtual++
+                                                        con.query("UPDATE candidatos SET votos=? WHERE codigo=?", [votosAtual, data[0].codigo], (err) => {
+                                                            if (err) {
+                                                                console.log('erro interno do servidor')
+                                                                res.status(500).send('erro interno do servidor')
+                                                            } else {
+                                                                let votos_b = data[1].votos
+                                                                        let boletim = {
+                                                                            nome: data[0].nome,
+                                                                            votos: data[0].votos+1,
+                                                                            votos_branco: votos_b,
+                                                                            codigo: codigo
+                                                                        }
+                                                                        console.log('enviando dados.')
+                                                                        res.send(JSON.stringify(boletim))
+                                                            }
+                                                        })
+                                                    } else {
+                                                        if (data[0].codigo === 0) {
+                                                            console.log('voto em branco.')
+                                                        let votosAtual = data[0].votos
+                                                        console.log(data[0].votos)
+                                                        votosAtual++
+                                                        con.query("UPDATE candidatos SET votos=? WHERE codigo=?", [votosAtual, data[0].codigo], (err) => {
+                                                            if (err) {
+                                                                console.log('erro interno do servidor')
+                                                                res.status(500).send('erro interno do servidor')
+                                                            } else {
+                                                                if (data.length === 2) {
+                                                                    let votos_b = data[0].votos
+                                                                        let boletim = {
+                                                                            nome: 'voto em branco',
+                                                                            votos: data[0].votos,
+                                                                            votos_branco: data[0].votos,
+                                                                            codigo: codigo
+                                                                        }
+                                                                        console.log('enviando dados.')
+                                                                        res.send(JSON.stringify(boletim))
+                                                                } else {
+                                                                    if (data[0].codigo === codigo && codigo===0) {
+                                                                        let boletim = {
+                                                                        nome: 'voto em branco',
+                                                                        votos_branco: data[0].votos,
+                                                                        votos: data[0].votos,
+                                                                        codigo: k2
+                                                                        } 
+                                                                        res.send(JSON.stringify(boletim))
+                                                                } else {
+                                                                    console.log('nada ve')
+                                                                    res.status(401).send('candidato não existe.')
+                                                                }
+                                                            }
+                                                        }})
+
+                                                        }
+                                                    }
+                                            }
+                                        }
+                                    })
                                 }
                             } 
                         }
@@ -50,78 +121,7 @@ app.post('/voto', (req, res) => {
                 }
             }
         })
-        con.query("SELECT * FROM candidatos WHERE codigo=? OR codigo=0 ORDER BY codigo DESC", [codigo], (err, data) => {
-            console.log(data)
-            if (err) {
-                res.status(500).send('erro interno do servidor')
-            } else {
-                if (data.length === 1 && data[0].codigo !== 0) {
-                    console.log('candidato não existe.')
-                    res.status(401).send('candidato não encontrado.')
-                } else {
-                        if (data.length === 2) {
-                            console.log('candidato encontrado.')
-                            let votosAtual = data[0].votos
-                            console.log(data[0].votos)
-                            votosAtual++
-                            con.query("UPDATE candidatos SET votos=? WHERE codigo=?", [votosAtual, data[0].codigo], (err) => {
-                                if (err) {
-                                    console.log('erro interno do servidor')
-                                    res.status(500).send('erro interno do servidor')
-                                } else {
-                                     let votos_b = data[1].votos
-                                             let boletim = {
-                                                nome: data[0].nome,
-                                                votos: data[0].votos+1,
-                                                votos_branco: votos_b,
-                                                codigo: codigo
-                                             }
-                                            console.log('enviando dados.')
-                                            res.send(JSON.stringify(boletim))
-                                }
-                            })
-                        } else {
-                            if (data[0].codigo === 0) {
-                                console.log('voto em branco.')
-                            let votosAtual = data[0].votos
-                            console.log(data[0].votos)
-                            votosAtual++
-                            con.query("UPDATE candidatos SET votos=? WHERE codigo=?", [votosAtual, data[0].codigo], (err) => {
-                                if (err) {
-                                    console.log('erro interno do servidor')
-                                    res.status(500).send('erro interno do servidor')
-                                } else {
-                                    if (data.length === 2) {
-                                         let votos_b = data[0].votos
-                                             let boletim = {
-                                                nome: 'voto em branco',
-                                                votos: data[0].votos,
-                                                votos_branco: data[0].votos,
-                                                codigo: codigo
-                                             }
-                                            console.log('enviando dados.')
-                                            res.send(JSON.stringify(boletim))
-                                    } else {
-                                        if (data[0].codigo === codigo && codigo===0) {
-                                            let boletim = {
-                                            nome: 'voto em branco',
-                                            votos_branco: data[0].votos,
-                                            votos: data[0].votos,
-                                            codigo: k2
-                                            } 
-                                            res.send(JSON.stringify(boletim))
-                                    } else {
-                                        console.log('nada ve')
-                                        res.status(401).send('candidato nada ve')
-                                    }
-                                }
-                            }})
-
-                            }
-                        }
-                }
-            }
-        })
+        
     })
 })
 app.post('/cred', (req, res) => {
@@ -245,6 +245,11 @@ app.post('/ver', (req, res)=> {
                 if (data.length === 0) {
                     res.status(401).send('A conta à qual você estava conectado não existe.')
                 } else {
+                    con.query("SELECT * FROM usuarios WHERE email=?", [data[0].email], (err, data2) => {
+                        if (err) {res.status(500).send('E.I.S.')} else {
+                            res.send(JSON.stringify(data2))
+                        }
+                    })
                     res.status(200).send('está dado o aval!!!')
                 }
             }
