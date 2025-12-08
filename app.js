@@ -210,6 +210,26 @@ app.post('/login', (req, res) => {
     })
 })
 
+app.post('/ver', (req, res)=> {
+    let tk = ''
+    req.on('data', (chunk) =>{j+=chunk})
+    req.on('end', () => {
+        con.query('SELECT * FROM sessoes WHERE token=?', [tk], (err, data) => {
+            if (err) {
+                console.log('erro interno no servidor')
+                res.status(500).send('erro interno no servidor')
+            } else {
+                if (data.length === 0) {
+                    res.status(401).send('A conta à qual você estava conectado não existe.')
+                } else {
+                    res.status(200).send('está dado o aval!!!')
+                }
+            }
+        })
+    })
+})
+
+
 app.listen(8080, () => {
     console.log('servidor rodando em 8080')
 })

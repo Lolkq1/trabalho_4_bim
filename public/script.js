@@ -5,7 +5,14 @@ const candid = document.querySelector("#nome_candidato")
 const divboletim = document.querySelector(".boletimdiv")
 const divvoto = document.querySelector(".votediv")
 const input = document.querySelector("#candidato")
-    if (localStorage.getItem('votou') == 'true') {
+
+let sessionT = localStorage.getItem('sessionToken')
+if (sessionT !== undefined && sessionT.length > 0) {
+    fetch('/ver', {
+        method: 'POST',
+        body: sessionT
+    }).then(res => {if (res.ok) {
+        if (localStorage.getItem('votou') == 'true') {
         console.log(localStorage.getItem('votou'))
         fetch('/cred', {
             method:'POST',
@@ -71,3 +78,15 @@ const input = document.querySelector("#candidato")
         }
 
 
+    } else {
+        document.location.href = 'http://localhost:8080/telaInicial.html'
+    }
+
+})
+} else {
+    document.location.href = 'http://localhost:8080/telaInicial.html'
+}
+
+
+
+    
