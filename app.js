@@ -141,11 +141,72 @@ app.post('/cred', (req, res) => {
 })
 
 app.post('/criar', (req, res) => {
-    
+    let ney = ''
+    req.on('data', (chunk) => {ney+=chunk})
+    req.on('end', () => {
+        let messi = JSON.parse(ney)
+        con.query("SELECT * FROM usuarios WHERE email=?", [messi.email], (err, data) => {
+            if (err) {
+                console.log('erro interno ao criar conta')
+                res.status(500).send('erro interno do servidor.')
+            } else {
+                if (data.length >= 1) {
+                    console.log('ja existe alguem com esse email registrado!!!')
+                    res.status(401).send('este email já está em uso!')
+                } else {
+                        bcrypt.hash(messi.senha, 3).then(hash => {
+                        let horaresenha = new Date()
+                        let token = crypto.createHash('sha256').update(horaresenha).digest('hex')
+                        con.query('INSERT INTO usuarios VALUES (?,?,?)', [messi.email, messi.nome, hash], (err) => {
+                            if (err) {
+                                console.log('erro interno do servidor')
+                                res.status(500).send('erro interno do servidor')
+                            } else {
+                                con.query('INSERT INTO tokens VALUES (?,?)', [token, messi.email], (err) => {
+                                    if (err) {
+                                        console.log('a conta foi criada, porém houve um erro na criação do token.')
+                                        res.status(500).send('erro interno do servidor; tente logar na página de login.')
+                                    } else {
+                                        console.log('conta criada com sucesso! Enviando token para o cliente...')
+                                        res.send(token)
+                                    }
+                                })
+                            }
+                        })
+                    })
+                }
+            }
+        })
+    })
 })
 
 app.post('/login', (req, res) => {
-
+    let kmbappe = ''
+    req.on('data', (chunk) => {kmbappe+=chunk})
+    req.on('end', () => {
+        let mbappe = JSON.parse(kmbappe)
+        con.query('SELECT * FROM usuarios WHERE email=?', [mbappe.email], (err, data) => {
+            if (err) {
+                console.log('erro interno do server.')
+                res.status(500).send('erro interno.')
+            } else {
+                if (data.length === 0) {
+                    res.status(401).send('erro: não existe nenhuma conta registrada com esse e-mail.')
+                } else {
+                    bcrypt.compare(mbappe.senha, data[0].hash).then(resultado => {
+                        if (resultado) {
+                            let data = new Date()
+                            let token = crypto.createHash('sha256').update(data).digest('hex')
+                            res.send(token)
+                        } else {
+                            console.log('senha incorreta inserida.')
+                            res.status(401).send('erro: senha incorreta')
+                        }
+                    })
+                }
+            }
+        })
+    })
 })
 
 app.listen(8080, () => {

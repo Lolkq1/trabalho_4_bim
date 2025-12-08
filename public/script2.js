@@ -33,11 +33,11 @@ const resenha2 = document.querySelector("#resenha2")
 btnCriar.addEventListener("click", () => {
     fetch("/criar", {
         method: 'POST',
-        body: {
+        body: JSON.stringify({
             nome: nome,
             email: resenha1,
             senha: resenha2
-        }
+        })
     }).then(res => {
         if (res.ok) {
             res.text().then(ney => {
@@ -56,10 +56,10 @@ const senha = document.querySelector("#senha")
 btnLogin.addEventListener("click", () => {
     fetch('/login', {
         method: 'POST',
-        body: {
+        body: JSON.stringify({
             email: email,
             senha: senha
-        }
+        })
     }).then(res => {
         if (res.ok) {
             res.text().then(santos2012 => {
