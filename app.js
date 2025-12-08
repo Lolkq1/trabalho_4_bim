@@ -83,7 +83,6 @@ app.post('/voto', (req, res) => {
                                                                 res.status(500).send('erro interno do servidor')
                                                             } else {
                                                                 if (data.length === 2) {
-                                                                    let votos_b = data[0].votos
                                                                         let boletim = {
                                                                             nome: 'voto em branco',
                                                                             votos: data[0].votos,
@@ -154,108 +153,14 @@ app.post('/cred', (req, res) => {
                             res.send(JSON.stringify(boletim))
                     } else {
                         console.log('nada ve')
-                        res.status(401).send('candidato inexistente.')
+                        res.status(401).send('candidato nada ve')
                     }
                 }
-                
-            }
-        })
-    })
-})
-
-app.post('/criar', (req, res) => {
-    let ney = ''
-    req.on('data', (chunk) => {ney+=chunk})
-    req.on('end', () => {
-        let messi = JSON.parse(ney)
-        con.query("SELECT * FROM usuarios WHERE email=?", [messi.email], (err, data) => {
-            if (err) {
-                console.log('erro interno ao criar conta')
-                res.status(500).send('erro interno do servidor.')
-            } else {
-                if (data.length >= 1) {
-                    console.log('ja existe alguem com esse email registrado!!!')
-                    res.status(401).send('este email já está em uso!')
-                } else {
-                        bcrypt.hash(messi.senha, 3).then(hash => {
-                        let horaresenha = new Date()
-                        let token = crypto.createHash('sha256').update(horaresenha).digest('hex')
-                        con.query('INSERT INTO usuarios VALUES (?,?,?,?,?)', [messi.email, messi.nome, hash, false, -1], (err) => {
-                            if (err) {
-                                console.log('erro interno do servidor')
-                                res.status(500).send('erro interno do servidor')
-                            } else {
-                                con.query('INSERT INTO tokens VALUES (?,?)', [token, messi.email], (err) => {
-                                    if (err) {
-                                        console.log('a conta foi criada, porém houve um erro na criação do token.')
-                                        res.status(500).send('erro interno do servidor; tente logar na página de login.')
-                                    } else {
-                                        console.log('conta criada com sucesso! Enviando token para o cliente...')
-                                        res.send(token)
-                                    }
-                                })
-                            }
-                        })
-                    })
                 }
             }
-        })
+        )})
     })
-})
 
-app.post('/login', (req, res) => {
-    let kmbappe = ''
-    req.on('data', (chunk) => {kmbappe+=chunk})
-    req.on('end', () => {
-        let mbappe = JSON.parse(kmbappe)
-        con.query('SELECT * FROM usuarios WHERE email=?', [mbappe.email], (err, data) => {
-            if (err) {
-                console.log('erro interno do server.')
-                res.status(500).send('erro interno.')
-            } else {
-                if (data.length === 0) {
-                    res.status(401).send('erro: não existe nenhuma conta registrada com esse e-mail.')
-                } else {
-                    bcrypt.compare(mbappe.senha, data[0].hash).then(resultado => {
-                        if (resultado) {
-                            let data = new Date()
-                            let token = crypto.createHash('sha256').update(data).digest('hex')
-                            con.query("INSERT INTO sessoes VALUES (?,?)", [token, mbappe.email])
-                            console.log('tudo certo! Senha correta; enviando token de sessão para o cliente... vai pra cima deles SANTOOOOOOOOOOOOOOOOOOOOOOOS')
-                            res.send(token)
-                        } else {
-                            console.log('senha incorreta inserida.')
-                            res.status(401).send('erro: senha incorreta')
-                        }
-                    })
-                }
-            }
-        })
-    })
-})
-
-app.post('/ver', (req, res)=> {
-    let tk = ''
-    req.on('data', (chunk) =>{j+=chunk})
-    req.on('end', () => {
-        con.query('SELECT * FROM sessoes WHERE token=?', [tk], (err, data) => {
-            if (err) {
-                console.log('erro interno no servidor')
-                res.status(500).send('erro interno no servidor')
-            } else {
-                if (data.length === 0) {
-                    res.status(401).send('A conta à qual você estava conectado não existe.')
-                } else {
-                    con.query("SELECT * FROM usuarios WHERE email=?", [data[0].email], (err, data2) => {
-                        if (err) {res.status(500).send('E.I.S.')} else {
-                            res.send(JSON.stringify(data2))
-                        }
-                    })
-                }
-            }
-        })
-    })
-})
 
 
 app.listen(8080, () => {

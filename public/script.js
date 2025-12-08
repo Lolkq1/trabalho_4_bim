@@ -16,7 +16,7 @@ if (sessionT !== undefined && sessionT.length > 0) {
             localStorage.setItem('votou',ooi.votou)
             localStorage.setItem('codigo', ooi.codigo)
                     if (localStorage.getItem('votou') == 'true') {
-                console.log(localStorage.getItem('votou'))
+                    console.log(localStorage.getItem('votou'))
                 fetch('/cred', {
                     method:'POST',
                     body: localStorage.getItem('codigo')
