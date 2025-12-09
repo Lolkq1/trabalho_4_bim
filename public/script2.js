@@ -34,9 +34,9 @@ btnCriar.addEventListener("click", () => {
     fetch("/criar", {
         method: 'POST',
         body: JSON.stringify({
-            nome: nome,
-            email: resenha1,
-            senha: resenha2
+            nome: nome.value,
+            email: resenha1.value,
+            senha: resenha2.value
         })
     }).then(res => {
         if (res.ok) {
@@ -57,8 +57,8 @@ btnLogin.addEventListener("click", () => {
     fetch('/login', {
         method: 'POST',
         body: JSON.stringify({
-            email: email,
-            senha: senha
+            email: email.value,
+            senha: senha.value
         })
     }).then(res => {
         if (res.ok) {

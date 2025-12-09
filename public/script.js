@@ -7,15 +7,16 @@ const divvoto = document.querySelector(".votediv")
 const input = document.querySelector("#candidato")
 
 let sessionT = localStorage.getItem('sessionToken')
-if (sessionT !== undefined && sessionT.length > 0) {
+if (sessionT !== undefined) {
     fetch('/ver', {
         method: 'POST',
         body: sessionT
     }).then(res => {if (res.ok) {
         res.text().then(obj => JSON.parse(obj)).then(ooi => {
-            localStorage.setItem('votou',ooi.votou)
-            localStorage.setItem('codigo', ooi.codigo)
-                    if (localStorage.getItem('votou') == 'true') {
+            console.log(ooi)
+            localStorage.setItem('votou',ooi[0].votou)
+            localStorage.setItem('codigo', ooi[0].codigo)
+                    if (localStorage.getItem('votou') == 1) {
                     console.log(localStorage.getItem('votou'))
                 fetch('/cred', {
                     method:'POST',
