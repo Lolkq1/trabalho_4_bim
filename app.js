@@ -13,6 +13,17 @@ const con = mysql.createConnection({
     database: 'candidatos'
 })
 
+function interno(err, res, p, add) {
+    if (err) {
+        console.log('erro interno do servidor')
+        res.status(500).send('erro interno do servidor')
+        return false
+    } else {
+        res.send(JSON.stringify(p))
+        return true
+    }
+}
+
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
@@ -65,11 +76,8 @@ app.post('/voto', (req, res) => {
                                                                         }
                                                                         console.log('enviando dados.')
                                                                         con.query("UPDATE usuarios SET votou=1, codigo=? WHERE email=?", [data3[0].codigo, data[0].email], (err) => {
-                                                                            if (err) {res.status(500).send('erro interno do servidor: voto não foi devidamente registrado.')} else {
-                                                                                res.send(JSON.stringify(boletim))
-                                                                            }
-                                                                        })
-                                                                        
+                                                                            interno(err, res, boletim)
+                                                                        })  
                                                             }
                                                             
                                                         })
@@ -91,9 +99,7 @@ app.post('/voto', (req, res) => {
                                                                         }
                                                                         console.log('enviando dados.')
                                                                         con.query("UPDATE usuarios SET votou=1 && codigo=? WHERE email=?", [data3[0].codigo, data[0].email], (err) => {
-                                                                            if (err) {res.status(500).send('erro interno do servidor: voto não foi devidamente registrado.')} else {
-                                                                                res.send(JSON.stringify(boletim))
-                                                                            }
+                                                                            interno()
                                                                         })
                                                                 } else if (data3[0].codigo === codigo && codigo===0) {
                                                                         let boletim = {
@@ -103,9 +109,7 @@ app.post('/voto', (req, res) => {
                                                                         codigo: k2
                                                                         } 
                                                                         con.query("UPDATE usuarios SET votou=1 && codigo=? WHERE email=?", [data3[0].codigo, data[0].email], (err) => {
-                                                                            if (err) {res.status(500).send('erro interno do servidor: voto não foi devidamente registrado.')} else {
-                                                                                res.send(JSON.stringify(boletim))
-                                                                            }
+                                                                            interno(err, res, boletim)
                                                                         })
                                                                 } else {
                                                                     console.log('nada ve')
@@ -139,9 +143,7 @@ app.post('/cred', (req, res) => {
         let k2 = parseInt(k)
         console.log(k2)
         con.query("SELECT * FROM candidatos WHERE codigo=? OR codigo=0 ORDER BY codigo DESC", [k2], (err, data) => {
-            if (err) {console.log('erro interno do servidor'); res.status(500).send('erro interno do servidor')} else {
-                console.log(data)
-                    if (data.length === 2) {
+            if (err) {console.log('erro interno do servidor'); res.status(500).send('erro interno do servidor')} else if (data.length === 2) {
                         let boletim = {
                         nome: data[0].nome,
                         votos: data[0].votos,
@@ -163,7 +165,7 @@ app.post('/cred', (req, res) => {
                     }
                 
                 
-            }
+            
         })
     })
 })

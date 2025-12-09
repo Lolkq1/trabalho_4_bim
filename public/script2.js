@@ -5,13 +5,19 @@ const btn1 = document.querySelector("#btn1")
 const btn2 = document.querySelector("#btn2")
 
 let sessionT = localStorage.getItem('sessionToken')
-if (sessionT === undefined) {
-    rodar()
-} else {
-    fetch('/ver', {
+
+switch (sessionT) {
+    case 'undefined':
+        rodar()
+        break
+    case ' ':
+        rodar()
+        break
+    default:
+        fetch('/ver', {
         method:'POST',
         body:sessionT
-    }).then(res => {
+        }).then(res => {
         if (res.ok) {
             res.text().then(obj => JSON.parse(obj)).then(obj2 => {
                 if (obj2.length === 0) {
@@ -21,10 +27,34 @@ if (sessionT === undefined) {
                 }
             })
         } else {
-            alert('um erro inesperado ocorreu')
+            alert('um erro inesperado ocorreu: tente entrar em sua conta novamente.')
+            localStorage.setItem('sessionToken', undefined)
+            rodar()
         }
     })
 }
+
+// if (sessionT === undefined) {
+//     rodar()
+// } else {
+//     fetch('/ver', {
+//         method:'POST',
+//         body:sessionT
+//     }).then(res => {
+//         if (res.ok) {
+//             res.text().then(obj => JSON.parse(obj)).then(obj2 => {
+//                 if (obj2.length === 0) {
+//                     rodar()
+//                 } else {
+//                     document.location.href = 'http://localhost:8080/'
+//                 }
+//             })
+//         } else {
+//             alert('um erro inesperado ocorreu: tente entrar em sua conta novamente.')
+            
+//         }
+//     })
+// }
 
 function rodar() {
     function switchTabs(div) {
@@ -53,6 +83,7 @@ const btnLogin = document.querySelector("#enois2")
 const nome = document.querySelector("#nome")
 const resenha1 = document.querySelector("#resenha1")
 const resenha2 = document.querySelector("#resenha2")
+console.log('teset')
 btnCriar.addEventListener("click", () => {
     fetch("/criar", {
         method: 'POST',
