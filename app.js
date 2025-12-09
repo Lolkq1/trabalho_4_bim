@@ -19,7 +19,6 @@ app.get('/', (req, res) => {
 })
 
 app.post('/voto', (req, res) => {
-    //verificaçao de credenciais
     let j=''
     req.on('data', (chunk) => {
         j+=chunk
@@ -29,28 +28,25 @@ app.post('/voto', (req, res) => {
         let codigo = j2.codigo
         let user = j2.eleitor
         con.query("SELECT * FROM sessoes where token=?", [user], (err, data) => {
-            if (err) {res.status(500).send('E.I.S.')} else {
-                if (data.length === 0) {
+            if (err) {res.status(500).send('E.I.S.')} else if (data.length === 0) {
                     res.status(401).send('usuario nao está logado//token inválido.')
                 } else {
+                    //token válido
                     con.query("SELECT * FROM usuarios WHERE email=?", [data[0].email], (err, data2) => {
-                        if (err) {console.log('erro interno svr')} else {
-                            if (data2.length === 0) {
+                        if (err) {console.log('erro interno svr')} else if (data2.length === 0) {
                             res.status(401).send('erro incomum: token válido, email inválido.')
-                            } else {
-                                if (data2[0].votou == 1) {
+                            } else if (data2[0].votou == 1) {
                                     res.status(401).send('usuário já votou.')
                                 } else {
+                                    // usuário existe e não votou
                                     con.query("SELECT * FROM candidatos WHERE codigo=? OR codigo=0 ORDER BY codigo DESC", [codigo], (err, data3) => {
                                         console.log(data3)
                                         if (err) {
                                             res.status(500).send('erro interno do servidor')
-                                        } else {
-                                            if (data3.length === 1 && data3[0].codigo !== 0) {
+                                        } else if (data3.length === 1 && data3[0].codigo !== 0) {
                                                 console.log('candidato não existe.')
                                                 res.status(401).send('candidato não encontrado.')
-                                            } else {
-                                                    if (data3.length === 2) {
+                                            } else if (data3.length === 2) {
                                                         console.log('candidato encontrado.')
                                                         let votosAtual = data3[0].votos
                                                         console.log(data3[0].votos)
@@ -77,8 +73,7 @@ app.post('/voto', (req, res) => {
                                                             }
                                                             
                                                         })
-                                                    } else {
-                                                        if (data3[0].codigo === 0) {
+                                                    } else if (data3[0].codigo === 0) {
                                                             console.log('voto em branco.')
                                                         let votosAtual = data3[0].votos
                                                         console.log(data3[0].votos)
@@ -87,9 +82,7 @@ app.post('/voto', (req, res) => {
                                                             if (err) {
                                                                 console.log('erro interno do servidor')
                                                                 res.status(500).send('erro interno do servidor')
-                                                            } else {
-                                                                if (data3.length === 2) {
-                                                                    let votos_b = data3[0].votos
+                                                            } else if (data3.length === 2) {
                                                                         let boletim = {
                                                                             nome: 'voto em branco',
                                                                             votos: data3[0].votos,
@@ -102,8 +95,7 @@ app.post('/voto', (req, res) => {
                                                                                 res.send(JSON.stringify(boletim))
                                                                             }
                                                                         })
-                                                                } else {
-                                                                    if (data3[0].codigo === codigo && codigo===0) {
+                                                                } else if (data3[0].codigo === codigo && codigo===0) {
                                                                         let boletim = {
                                                                         nome: 'voto em branco',
                                                                         votos_branco: data3[0].votos,
@@ -119,21 +111,21 @@ app.post('/voto', (req, res) => {
                                                                     console.log('nada ve')
                                                                     res.status(401).send('candidato não existe.')
                                                                 }
-                                                            }
-                                                        }})
+                                                            
+                                                        })
 
                                                         }
-                                                    }
-                                            }
-                                        }
+                                                    
+                                            
+                                        
                                     })
                                 }
-                            } 
-                        }
+                             
+                        
                         
                     } )
                 }
-            }
+            
         })
         
     })
@@ -157,8 +149,7 @@ app.post('/cred', (req, res) => {
                         votos_branco: data[1].votos
                         }
                         res.send(JSON.stringify(boletim))
-                    } else {
-                            if (data[0].codigo === k2 && k2===0) {
+                    } else if (data[0].codigo === k2 && k2===0) {
                                 let boletim = {
                                 nome: 'voto em branco',
                                 votos_branco: data[0].votos,
@@ -170,7 +161,7 @@ app.post('/cred', (req, res) => {
                         console.log('nada ve')
                         res.status(401).send('candidato inexistente.')
                     }
-                }
+                
                 
             }
         })
@@ -187,8 +178,7 @@ app.post('/criar', (req, res) => {
             if (err) {
                 console.log('erro interno ao criar conta')
                 res.status(500).send('erro interno do servidor.')
-            } else {
-                if (data.length >= 1) {
+            } else if (data.length >= 1) {
                     console.log('ja existe alguem com esse email registrado!!!')
                     res.status(401).send('este email já está em uso!')
                 } else {
@@ -214,7 +204,7 @@ app.post('/criar', (req, res) => {
                         })
                     })
                 }
-            }
+            
         })
     })
 })
@@ -229,8 +219,7 @@ app.post('/login', (req, res) => {
             if (err) {
                 console.log('erro interno do server.')
                 res.status(500).send('erro interno.')
-            } else {
-                if (data.length === 0) {
+            } else if (data.length === 0) {
                     res.status(401).send('erro: não existe nenhuma conta registrada com esse e-mail.')
                 } else {
                     bcrypt.compare(mbappe.senha, data[0].hash).then(resultado => {
@@ -250,7 +239,7 @@ app.post('/login', (req, res) => {
                         }
                     })
                 }
-            }
+            
         })
     })
 })
@@ -263,8 +252,7 @@ app.post('/ver', (req, res)=> {
             if (err) {
                 console.log('erro interno no servidor')
                 res.status(500).send('erro interno no servidor')
-            } else {
-                if (data.length === 0) {
+            } else if (data.length === 0) {
                     res.status(401).send('A conta à qual você estava conectado não existe.')
                 } else {
                     con.query("SELECT * FROM usuarios WHERE email=?", [data[0].email], (err, data2) => {
@@ -273,7 +261,7 @@ app.post('/ver', (req, res)=> {
                         }
                     })
                 }
-            }
+            
         })
     })
 })
