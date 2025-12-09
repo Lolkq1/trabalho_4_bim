@@ -154,7 +154,7 @@ app.post('/cred', (req, res) => {
                             res.send(JSON.stringify(boletim))
                     } else {
                         console.log('nada ve')
-                        res.status(401).send('candidato nada ve')
+                        res.status(401).send('candidato inexistente.')
                     }
                 }
                 
@@ -220,6 +220,7 @@ app.post('/login', (req, res) => {
                         if (resultado) {
                             let data = new Date()
                             let token = crypto.createHash('sha256').update(data).digest('hex')
+                            con.query("INSERT INTO sessoes VALUES (?,?)", [token, mbappe.email])
                             console.log('tudo certo! Senha correta; enviando token de sessão para o cliente... vai pra cima deles SANTOOOOOOOOOOOOOOOOOOOOOOOS')
                             res.send(token)
                         } else {
@@ -250,7 +251,6 @@ app.post('/ver', (req, res)=> {
                             res.send(JSON.stringify(data2))
                         }
                     })
-                    res.status(200).send('está dado o aval!!!')
                 }
             }
         })
