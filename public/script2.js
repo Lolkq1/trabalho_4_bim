@@ -4,7 +4,30 @@ const loginDiv = document.querySelector("#loginDiv")
 const btn1 = document.querySelector("#btn1")
 const btn2 = document.querySelector("#btn2")
 
-function switchTabs(div) {
+let sessionT = localStorage.getItem('sessionToken')
+if (sessionT === undefined) {
+    rodar()
+} else {
+    fetch('/ver', {
+        method:'POST',
+        body:sessionT
+    }).then(res => {
+        if (res.ok) {
+            res.text().then(obj => JSON.parse(obj)).then(obj2 => {
+                if (obj2.length === 0) {
+                    rodar()
+                } else {
+                    document.location.href = 'http://localhost:8080/'
+                }
+            })
+        } else {
+            alert('um erro inesperado ocorreu')
+        }
+    })
+}
+
+function rodar() {
+    function switchTabs(div) {
     // pode nao funcionar por conta da prioridade ja q ta pegando por tag mas jaé
     let divs = document.querySelectorAll("div")
     div.style.display = 'inline'
@@ -71,3 +94,4 @@ btnLogin.addEventListener("click", () => {
         }
     })
 })
+}
