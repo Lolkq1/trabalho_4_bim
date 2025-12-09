@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt')
 app.use(express.static(path.join(__dirname, 'public')))
 const con = mysql.createConnection({
     user: 'root',
-    password: process.env.PASSWORD,
+    password: 'santossempresantos',
     port: 3306,
     database: 'candidatos'
 })
@@ -54,7 +54,7 @@ app.post('/voto', (req, res) => {
                                         console.log(data3)
                                         if (err) {
                                             res.status(500).send('erro interno do servidor')
-                                        } else if (data3.length === 1 && data3[0].codigo !== 0) {
+                                        } else if (data3.length === 1 && data3[0].codigo == 0) {
                                                 console.log('candidato não existe.')
                                                 res.status(401).send('candidato não encontrado.')
                                             } else if (data3.length === 2) {
@@ -99,7 +99,7 @@ app.post('/voto', (req, res) => {
                                                                         }
                                                                         console.log('enviando dados.')
                                                                         con.query("UPDATE usuarios SET votou=1 && codigo=? WHERE email=?", [data3[0].codigo, data[0].email], (err) => {
-                                                                            interno()
+                                                                            interno(err, res, boletim)
                                                                         })
                                                                 } else if (data3[0].codigo === codigo && codigo===0) {
                                                                         let boletim = {
@@ -119,19 +119,11 @@ app.post('/voto', (req, res) => {
                                                         })
 
                                                         }
-                                                    
-                                            
-                                        
                                     })
                                 }
-                             
-                        
-                        
                     } )
                 }
-            
         })
-        
     })
 })
 app.post('/cred', (req, res) => {
@@ -163,9 +155,6 @@ app.post('/cred', (req, res) => {
                         console.log('nada ve')
                         res.status(401).send('candidato inexistente.')
                     }
-                
-                
-            
         })
     })
 })
@@ -178,6 +167,7 @@ app.post('/criar', (req, res) => {
         console.log(messi)
         con.query("SELECT * FROM usuarios WHERE email=?", [messi.email], (err, data) => {
             if (err) {
+                console.log(err)
                 console.log('erro interno ao criar conta')
                 res.status(500).send('erro interno do servidor.')
             } else if (data.length >= 1) {
@@ -206,7 +196,6 @@ app.post('/criar', (req, res) => {
                         })
                     })
                 }
-            
         })
     })
 })
@@ -241,7 +230,6 @@ app.post('/login', (req, res) => {
                         }
                     })
                 }
-            
         })
     })
 })
@@ -263,7 +251,6 @@ app.post('/ver', (req, res)=> {
                         }
                     })
                 }
-            
         })
     })
 })
