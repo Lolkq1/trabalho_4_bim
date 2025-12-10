@@ -8,3 +8,10 @@ CREATE TABLE admin (email VARCHAR(100) PRIMARY KEY, nome VARCHAR(40) NOT NULL, h
 CREATE TABLE sessoes_a (token VARCHAR(100) PRIMARY KEY, email VARCHAR(100));
 "voto_branco" => INSERT INTO candidatos VALUES ("voto_branco", 0, 0)
 "sem_voto" => INSERT INTO candidatos VALUES ("sem_voto", 0, -1)
+p criar conta inicial de adm:
+fetch('/resenha').then( res =>
+    res.text().then(obj => console.log(obj)))
+
+app.get('/resenha', (req,res) => {
+    bcrypt.hash('ney', 3).then(hash => res.send(hash))
+})

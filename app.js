@@ -320,9 +320,9 @@ app.post('/criar_adm', (req, res) => {
 })
 
 // isso aq eh so setup pra criar conta de adm
-// app.get('/resenha', (req,res) => {
-//     bcrypt.hash('ney', 3).then(hash => res.send(hash))
-// })
+app.get('/resenha', (req,res) => {
+    bcrypt.hash('ney', 3).then(hash => res.send(hash))
+})
 
 app.listen(8080, () => {
     console.log('servidor rodando em 8080')
