@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt')
 app.use(express.static(path.join(__dirname, 'public')))
 const con = mysql.createConnection({
     user: 'root',
-    password: 'santossempresantos',
+    password: process.env.PASSWORD,
     port: 3306,
     database: 'candidatos'
 })
