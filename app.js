@@ -8,23 +8,10 @@ const bcrypt = require('bcrypt')
 app.use(express.static(path.join(__dirname, 'public')))
 const con = mysql.createConnection({
     user: 'root',
-    password: 'santossempresantos',
+    password: process.env.PASSWORD,
     port: 3306,
     database: 'candidatos'
 })
-
-function interno(err, res, p, add) {
-    if (err) {
-        console.log('erro interno do servidor')
-        res.status(500).send('erro interno do servidor')
-        return false
-    } else {
-        res.send(JSON.stringify(p))
-        return true
-    }
-}
-
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
@@ -54,10 +41,7 @@ app.post('/voto', (req, res) => {
                                         console.log(data3)
                                         if (err) {
                                             res.status(500).send('erro interno do servidor')
-                                        } else if (data3.length === 1 && data3[0].codigo == 0) {
-                                                console.log('candidato não existe.')
-                                                res.status(401).send('candidato não encontrado.')
-                                            } else if (data3.length === 2) {
+                                        } else if (data3.length === 2) {
                                                         console.log('candidato encontrado.')
                                                         let votosAtual = data3[0].votos
                                                         console.log(data3[0].votos)
@@ -76,12 +60,16 @@ app.post('/voto', (req, res) => {
                                                                         }
                                                                         console.log('enviando dados.')
                                                                         con.query("UPDATE usuarios SET votou=1, codigo=? WHERE email=?", [data3[0].codigo, data[0].email], (err) => {
-                                                                            interno(err, res, boletim)
+                                                                            if (err) {
+                                                                                console.log('erro interno do servidor')
+                                                                                res.status(500).send('erro interno do servidor')
+                                                                            } else {
+                                                                                res.send(JSON.stringify(boletim))
+                                                                            }
                                                                         })  
                                                             }
-                                                            
                                                         })
-                                                    } else if (data3[0].codigo === 0) {
+                                            } else if (data3[0].codigo == codigo && codigo == 0) {
                                                             console.log('voto em branco.')
                                                         let votosAtual = data3[0].votos
                                                         console.log(data3[0].votos)
@@ -90,34 +78,26 @@ app.post('/voto', (req, res) => {
                                                             if (err) {
                                                                 console.log('erro interno do servidor')
                                                                 res.status(500).send('erro interno do servidor')
-                                                            } else if (data3.length === 2) {
-                                                                        let boletim = {
-                                                                            nome: 'voto em branco',
-                                                                            votos: data3[0].votos,
-                                                                            votos_branco: data3[0].votos,
-                                                                            codigo: codigo
-                                                                        }
-                                                                        console.log('enviando dados.')
-                                                                        con.query("UPDATE usuarios SET votou=1 && codigo=? WHERE email=?", [data3[0].codigo, data[0].email], (err) => {
-                                                                            interno(err, res, boletim)
-                                                                        })
-                                                                } else if (data3[0].codigo === codigo && codigo===0) {
+                                                            } else {
                                                                         let boletim = {
                                                                         nome: 'voto em branco',
                                                                         votos_branco: data3[0].votos,
                                                                         votos: data3[0].votos,
-                                                                        codigo: k2
+                                                                        codigo: codigo
                                                                         } 
-                                                                        con.query("UPDATE usuarios SET votou=1 && codigo=? WHERE email=?", [data3[0].codigo, data[0].email], (err) => {
-                                                                            interno(err, res, boletim)
+                                                                        con.query("UPDATE usuarios SET votou=1, codigo=? WHERE email=?", [data3[0].codigo, data[0].email], (err) => {
+                                                                            if (err) {
+                                                                                console.log('erro interno do servidor')
+                                                                                res.status(500).send('erro interno do servidor')
+                                                                            } else {
+                                                                                console.log('atualisei')
+                                                                                res.send(JSON.stringify(boletim))
+                                                                            }
                                                                         })
-                                                                } else {
-                                                                    console.log('nada ve')
-                                                                    res.status(401).send('candidato não existe.')
-                                                                }
-                                                            
+                                                                }                                                       
                                                         })
-
+                                                        } else {
+                                                            res.status(401).send('candidato não encontrado.')
                                                         }
                                     })
                                 }
@@ -126,6 +106,7 @@ app.post('/voto', (req, res) => {
         })
     })
 })
+
 app.post('/cred', (req, res) => {
     let k = ''
     req.on('data', (chunk) => {
@@ -167,7 +148,6 @@ app.post('/criar', (req, res) => {
         console.log(messi)
         con.query("SELECT * FROM usuarios WHERE email=?", [messi.email], (err, data) => {
             if (err) {
-                console.log(err)
                 console.log('erro interno ao criar conta')
                 res.status(500).send('erro interno do servidor.')
             } else if (data.length >= 1) {
@@ -255,6 +235,7 @@ app.post('/ver', (req, res)=> {
     })
 })
 
+app.post('/adm')
 
 app.listen(8080, () => {
     console.log('servidor rodando em 8080')

@@ -5,8 +5,11 @@ const candid = document.querySelector("#nome_candidato")
 const divboletim = document.querySelector(".boletimdiv")
 const divvoto = document.querySelector(".votediv")
 const input = document.querySelector("#candidato")
-
+const voltar = document.querySelector(".voltar")
 let sessionT = localStorage.getItem('sessionToken')
+voltar.addEventListener("click", () => {
+    localStorage.setItem('sessionToken', undefined)}
+)
 if (sessionT !== undefined) {
     fetch('/ver', {
         method: 'POST',
@@ -37,7 +40,9 @@ if (sessionT !== undefined) {
                             }
                 }) } else {
                 //parte do voto
-                
+            
+
+
                 btn.addEventListener("click", () => {
                 if (input.value.length != 0 && input.value != " " && typeof parseInt(input.value) === "number") {
                     fetch('/voto', {
