@@ -1,12 +1,17 @@
+console.log(localStorage.getItem('adm'))
 const mainDiv = document.querySelector("#mainDiv")
 const createDiv = document.querySelector("#createDiv")
 const loginDiv = document.querySelector("#loginDiv")
+const adminDiv = document.querySelector("#adminDiv")
 const btn1 = document.querySelector("#btn1")
 const btn2 = document.querySelector("#btn2")
+const btn3 = document.querySelector("#btn3")
 
 let sessionT = localStorage.getItem('sessionToken')
-
-switch (sessionT) {
+let admq = localStorage.getItem('adm')
+console.log(admq)
+function analiseNormal() {
+    switch (sessionT) {
     case 'undefined':
         rodar()
         break
@@ -32,6 +37,32 @@ switch (sessionT) {
             rodar()
         }
     })
+}
+}
+switch (admq) {
+    case '1':
+        console.log('um')
+        fetch('/veradmin', {
+            method: 'POST',
+            body: sessionT
+        }).then(res => {
+            if (res.ok) {
+                location.href='http://localhost:8080/telaAdmin.html'
+            } else {
+                res.text().then(obj => alert(obj))
+                localStorage.setItem('adm', 0)
+                analiseNormal()
+            }
+        })
+    break;
+    case '0':
+        console.log('zero')
+        analiseNormal()
+    break;
+    default:
+        console.log('nada ve ze')
+        analiseNormal()
+    break
 }
 
 // if (sessionT === undefined) {
@@ -77,13 +108,24 @@ btn2.addEventListener("click", () => {
     switchTabs(loginDiv)
 })
 
+btn3.addEventListener("click", () => {
+    switchTabs(adminDiv)
+})
+
+const voltar = document.querySelector(".voltar")
+
 const btnCriar = document.querySelector("#enois")
 const btnLogin = document.querySelector("#enois2")
+const btnADM = document.querySelector("#enois3")
 
 const nome = document.querySelector("#nome")
 const resenha1 = document.querySelector("#resenha1")
 const resenha2 = document.querySelector("#resenha2")
 console.log('teset')
+
+voltar.addEventListener("click", () => {
+    switchTabs(mainDiv)
+})
 btnCriar.addEventListener("click", () => {
     fetch("/criar", {
         method: 'POST',
@@ -119,6 +161,29 @@ btnLogin.addEventListener("click", () => {
             res.text().then(santos2012 => {
                 localStorage.setItem('sessionToken', santos2012)
                 document.location.href='http://localhost:8080/'
+            })
+        } else {
+            res.text().then(neymaaaar => alert(neymaaaar))
+        }
+    })
+})
+
+const email2 = document.querySelector("#email2")
+const senha2 = document.querySelector("#senha2")
+
+btnADM.addEventListener("click", () => {
+    fetch('/adm', {
+        method: 'POST',
+        body: JSON.stringify({
+            email: email2.value,
+            senha: senha2.value
+        })
+    }).then(res => {
+        if (res.ok) {
+            res.text().then(santos2012 => {
+                localStorage.setItem('sessionToken', santos2012)
+                localStorage.setItem('adm', 1)
+                document.location.href='http://localhost:8080/telaAdmin.html'
             })
         } else {
             res.text().then(neymaaaar => alert(neymaaaar))

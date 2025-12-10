@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt')
 app.use(express.static(path.join(__dirname, 'public')))
 const con = mysql.createConnection({
     user: 'root',
-    password: process.env.PASSWORD,
+    password: 'santossempresantos',
     port: 3306,
     database: 'candidatos'
 })
@@ -218,6 +218,7 @@ app.post('/ver', (req, res)=> {
     let tk = ''
     req.on('data', (chunk) =>{tk+=chunk})
     req.on('end', () => {
+        console.log(tk)
         con.query('SELECT * FROM sessoes WHERE token=?', [tk], (err, data) => {
             if (err) {
                 console.log('erro interno no servidor')
@@ -235,7 +236,93 @@ app.post('/ver', (req, res)=> {
     })
 })
 
-app.post('/adm')
+app.post('/veradmin', (req, res)=> {
+    let tk = ''
+    req.on('data', (chunk) =>{tk+=chunk})
+    req.on('end', () => {
+        console.log('cheou aqui em veradmin chiq chiq bahia', tk)
+        con.query('SELECT * FROM sessoes_a WHERE token=?', [tk], (err, data) => {
+            if (err) {
+                console.log('erro interno no servidor (ADM)')
+                res.status(500).send('erro interno no servidor (parte de ADM)')
+            } else if (data.length === 0) {
+                    res.status(401).send('A conta à qual você estava conectado não existe.')
+                } else {
+                    con.query("SELECT * FROM admin WHERE email=?", [data[0].email], (err, data2) => {
+                        if (err) {res.status(500).send('E.I.S.')} else {
+                            res.send(JSON.stringify(data2))
+                        }
+                    })
+                }
+        })
+    })
+})
+
+app.post('/adm', (req, res) => {
+     let kmbappe = ''
+    req.on('data', (chunk) => {kmbappe+=chunk})
+    req.on('end', () => {
+        let mbappe = JSON.parse(kmbappe)
+        console.log(mbappe)
+        con.query('SELECT * FROM admin WHERE email=?', [mbappe.email], (err, data) => {
+            if (err) {
+                console.log('erro interno do server.')
+                res.status(500).send('erro interno.')
+            } else if (data.length === 0) {
+                    res.status(401).send('erro: não existe nenhuma conta registrada com esse e-mail.')
+                } else {
+                    bcrypt.compare(mbappe.senha, data[0].hash).then(resultado => {
+                        if (resultado) {
+                            let data = new Date()
+                            let mili = data.getMilliseconds().toString()
+                            let token = crypto.createHash('sha256').update(mili).digest('hex')
+                            console.log(token)
+                            con.query("INSERT INTO sessoes_a VALUES (?,?)", [token, mbappe.email], (err) => {
+                                if (err) {console.log('token nao foi salvo. Login nao realizado.');res.status(500).send('não foi possível fazer o login. Tente novamente mais tarde.')} else {
+                                    console.log('admin logado com sucesso. VAI PRA CIMA DELES SANTOS!!!!!!!!!!!!!!!!111111111')
+                                    res.send(token)
+                                }
+                            })
+                        } else {
+                            console.log('senha incorreta inserida.')
+                            res.status(401).send('erro: senha incorreta')
+                        }
+                    })
+                }
+        })
+    })
+})
+
+app.post('/criar_adm', (req, res) => {
+    let j = ''
+    req.on('data', (chunk) => {
+        j+=chunk
+    })
+    req.on('end', () => {
+        let j2 = JSON.parse(j)
+        console.log(j2)
+        con.query("SELECT * FROM candidatos WHERE codigo=?", [j2.codigo], (err, data) => {
+            if (err) {console.log('erro interno do sv'); res.status(500).send('erro intenro tmj enois ai')} else if (data.length === 0) {
+                console.log('codigo disponivel. Criando candidato...')
+                con.query("INSERT INTO candidatos VALUES (?,?,?)", [j2.nome, 0, j2.codigo ], (err) => {
+                    if (err) {console.log('erro interno sv'); res.status(500).send('erro interno server')} else{
+                        res.send('tudo certo!!!!')
+                    }
+                })
+                } else {
+                    res.status(401).send('candidato já existe.')
+                }
+            
+            
+        })
+    })
+    
+})
+
+// isso aq eh so setup pra criar conta de adm
+// app.get('/resenha', (req,res) => {
+//     bcrypt.hash('ney', 3).then(hash => res.send(hash))
+// })
 
 app.listen(8080, () => {
     console.log('servidor rodando em 8080')
