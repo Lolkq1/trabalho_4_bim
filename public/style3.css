@@ -1,10 +1,4 @@
-.voltar {
-    position: absolute;
-    top: 95%;
-    left: 5%;
-    transform: translate(-5%, -95%);
-    cursor: pointer;
-}
+
 
 body {
     min-height: 100vh;
@@ -17,6 +11,14 @@ body {
     display: none;
 } */
 
+#btn {
+    font-size: 15px;
+    width: 70px;
+    height: 40px;
+    left: 50%;
+    transform: translate(-50%);
+}
+
 div {
     width: 300px;
     height: 400px;
@@ -28,47 +30,46 @@ div {
     border-radius: 5px;
 }
 
-div > h1, p {
+label, input, button {
     position: relative;
+    top: 5%;
     left: 5%;
-}
-
-div > label, input, button {
+    margin-top: 10px;
     display: block;
-    margin-left: 5%;
-    margin-top: 5%;
 }
 
-div > label {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+#mainTitulo4 {
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+    width: 70%;
 }
 
-#btn {
+button {
     background-color: rgb(46, 119, 255);
     padding: 5px 5px;
     color: white;
     cursor: pointer;
-    width: 70px;
-    height: 40px;
-    font-size: 15px;
     border-radius: 5px;
     border: none;
 }
 
-#candidato {
-    height: 30px;
-    width: 80%;
-    border-radius: 5px;
-}
-
-#btn:hover {
+button:hover {
     transition: 0.5s;
     background-color: rgb(46, 255, 168);
 }
 
+.voltar {
+    position: absolute;
+    top: 95%;
+    left: 5%;
+    transform: translate(-5%, -95%);
+    cursor: pointer;
+}
 
-.boletimdiv {
-    display: none;
+
+#mainDiv {
+    display: inline;
 }
 
 .govimg {
@@ -78,4 +79,10 @@ div > label {
     left: 98%;
     top: 100%;
     transform: translate(-100%, -100%);
+}
+
+
+input {
+    width: 90%;
+    height: 30px;
 }
